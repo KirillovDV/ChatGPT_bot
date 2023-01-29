@@ -11,7 +11,7 @@ openai.api_key = openai_api_key
 bot = telebot.TeleBot(BOT_API)
 
 # Help information
-help_text = "Hi. This bot is just a way to communicate with Chat-GPT via OpnaAI API. You can find source code of this bot here:  \n If you have any questions, please contact Denis"
+help_text = "Hi. This bot is just a way to communicate with Chat-GPT via OpnaAI API. You can find source code of this bot here: https://github.com/KirillovDV/ChatGPT_bot  \n If you have any questions, please contact @KirillovDV"
 
 # Handling messages from Telegram users
 @bot.message_handler(content_types=['text'])
