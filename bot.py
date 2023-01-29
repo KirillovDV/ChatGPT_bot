@@ -11,29 +11,35 @@ openai.api_key = openai_api_key
 bot = telebot.TeleBot(BOT_API)
 
 # Help information
-help_text = "Hi. This bot is just a way to communicate with Chat-GPT via OpnaAI API. You can find source code of this bot here: https://github.com/KirillovDV/ChatGPT_bot  \n If you have any questions, please contact @KirillovDV"
+help_msg= "Hi. This bot is just a way to communicate with Chat-GPT via OpnaAI API. You can find source code of this bot here: https://github.com/KirillovDV/ChatGPT_bot  \n If you have any questions, please contact @KirillovDV"
+welcome_msg = "Hi, I'm a ChatGPT bot. Click the Info button to learn more about me. To start chatting with me, just send me any message."
 
-# Handling messages from Telegram users
+
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    itembtn1 = types.KeyboardButton('Info')
+    markup.add(itembtn1)
+    bot.send_message(chat_id=message.chat.id, text=welcome_msg, reply_markup=markup)
+
+
+
+
+@bot.message_handler(func=lambda message: message.text == 'Info')
+def send_help(message):
+        bot.send_message(chat_id=message.chat.id, text=help_msg)
+
 @bot.message_handler(content_types=['text'])
 def handle_message(message):
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt='Bot: ' + message.text,
-        max_tokens=1024,
+        max_tokens=2048,
         n=1,
         stop=None,
         temperature=0.5,
     ).choices[0].text
+    bot.send_message(chat_id=message.chat.id, text=response)
 
-    markup = types.InlineKeyboardMarkup()
-    itembtn = types.InlineKeyboardButton('Help', callback_data='help')
-    markup.add(itembtn)
-    bot.send_message(chat_id=message.chat.id, text=response, reply_markup=markup)
-
-# Handling inline buttons
-@bot.callback_query_handler(func=lambda call: call.data == 'help')
-def callback_help(call):
-    bot.send_message(chat_id=call.message.chat.id, text=help_text)
-
-# Starting bot
 bot.polling()
