@@ -11,24 +11,52 @@ openai.api_key = openai_api_key
 bot = telebot.TeleBot(BOT_API)
 
 # Help information
-help_msg= "Hi. This bot is just a way to communicate with Chat-GPT via OpnaAI API. You can find source code of this bot here: https://github.com/KirillovDV/ChatGPT_bot  \n If you have any questions, please contact @KirillovDV"
+help_msg_en = "Hi. This bot is just a way to communicate with Chat-GPT via OpnaAI API. You can find source code of this bot here: https://github.com/KirillovDV/ChatGPT_bot  \n If you have any questions, please contact @KirillovDV"
 welcome_msg = "Hi, I'm a ChatGPT bot. Click the Info button to learn more about me. To start chatting with me, just send me any message."
+switch_to_English_msg = 'Switch to English'
+switch_to_Russian_msg = 'Переключиться на Русский язык'
 
 
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    itembtn1 = types.KeyboardButton('Info')
-    markup.add(itembtn1)
+    itembtn_info = types.KeyboardButton('Info')
+    itembtn_en = types.KeyboardButton(switch_to_English_msg)
+    itembtn_ru = types.KeyboardButton(switch_to_Russian_msg)
+    markup.add(itembtn_info)
+    markup.add(itembtn_en)
+    markup.add(itembtn_ru)
     bot.send_message(chat_id=message.chat.id, text=welcome_msg, reply_markup=markup)
+
+@bot.message_handler(func=lambda message: message.text == 'Info')
+def send_help(message):
+        bot.send_message(chat_id=message.chat.id, text=help_msg)
+
+# функция для отправки сообщения в зависимости от языка
+def send_message(message, lang="select en"):
+    bot.send_message(chat_id=message.chat.id, text=texts[lang])
+
+# обработчик команды на переключение языка
+@bot.message_handler(commands=["switch_lang"])
+def switch_language(message):
+    if message.text == "/switch_lang en":
+        send_message(message, switch_to_English_msg)
+    elif message.text == "/switch_lang ru":
+        send_message(message, switch_to_Russian_msg)
+    else:
+        bot.send_message(chat_id=message.chat.id, text="Language not supported \n Язык не поддерживается")
+
+
+
+
 
 
 
 
 @bot.message_handler(func=lambda message: message.text == 'Info')
 def send_help(message):
-        bot.send_message(chat_id=message.chat.id, text=help_msg)
+        bot.send_message(chat_id=message.chat.id, text=help_msg_en)
 
 @bot.message_handler(content_types=['text'])
 def handle_message(message):
